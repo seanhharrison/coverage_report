@@ -17,7 +17,8 @@ setup the following variables
 ```
 sfid=<<your salesforce id>>
 sfpass=<<your salesforce pass>>
-sftoken<<your salesforce security token>>
+sftoken=<<your salesforce security token>>
+sfhost=<<server host>>  [ https://test.salesforce.com | https://login.salesforce.com ]
 spreadsheet_id=<<spreadsheet id>>
 spreadsheet_sheet_id=<<spreadsheet sheet id>>
 google_id=<<your google docs id>>

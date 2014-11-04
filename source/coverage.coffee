@@ -4,7 +4,8 @@ Q = require 'q'
 spreadsheet = require 'edit-google-spreadsheet'
 
 jsforce = require 'jsforce'
-conn = new jsforce.Connection()
+options = loginUrl: process.env.sfhost
+conn = new jsforce.Connection(options)
 
 num_lines_covered = 0
 num_lines_uncovered = 0
@@ -21,7 +22,7 @@ conn.login process.env.sfid, "#{process.env.sfpass}#{process.env.sftoken}", (err
     console.log err
     return
 
-  console.log "successfully logined in salesforce..."
+  console.log "successfully logged in to salesforce..."
 
   spreadsheet.load {
     debug: true,
