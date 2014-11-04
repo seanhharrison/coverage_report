@@ -15,7 +15,14 @@ array_class = new Array()
 coverage = (covered, uncovered) ->
   (covered / (covered + uncovered) * 100).toFixed(2)
 
-conn.login process.env.sfid, process.env.sfpass, ()->
+conn.login process.env.sfid, "#{process.env.sfpass}#{process.env.sftoken}", (err, userInfo)->
+  if err
+    console.log 'Authentication Error!! Please check if your salesforce account is correct or not.'
+    console.log err
+    return
+
+  console.log "successfully logined in salesforce..."
+
   spreadsheet.load {
     debug: true,
     spreadsheetId: process.env.spreadsheet_id,
@@ -24,15 +31,30 @@ conn.login process.env.sfid, process.env.sfpass, ()->
     password: process.env.google_pass,
   }, (err, sheet) ->
     if err
-      throw err
+      console.log 'Error!! Please check if parameter of spreadsheet is correct or not. '
+      console.log err
+      return
+
     conn.tooling.sobject('ApexCodeCoverage').find (err, records)->
+      if err
+        console.log 'Unknown Error!! Please let me know this issue with the following error log.'
+        console.log err
+        return
+
+      console.log "successfully get test coverages..."
+
       records = _.sortBy records, (e) -> coverage(e.NumLinesCovered, e.NumLinesUncovered)
       records.reduce (promise, cover_rate) ->
         promise.then ->
           array_class[count] = new Array()
           conn.sobject('ApexClass').retrieve cover_rate.ApexClassOrTriggerId, (err,apex)->
             if err
-              console.log(err)
+              console.log 'Unknown Error!! Please let me know this issue with the following error log.'
+              console.log err
+              return
+
+            console.log "successfully get apex data..."
+
             array_class[count] = [
                 count+1,
                 apex.attributes.type,
@@ -57,5 +79,8 @@ conn.login process.env.sfid, process.env.sfpass, ()->
 
         sheet.send (err)->
           if err
-            throw err
-          console.log "Updated Successfully"
+            console.log 'Unknown Error!! Please let me know this issue with the following error log.'
+            console.log err
+            return
+
+          console.log "Updated spreadsheet successfully"
